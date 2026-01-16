@@ -21,8 +21,6 @@ Please ensure all the requirements are met before getting started.
 2. Have Intellij IDEA installed. Community edition is fine.
 3. Download Java 25 and set it as the SDK in IDEA.
 
-Currently this template only supports Windows!
-
 ## Configuring Template
 It is important to configure the project before using it as a template. Doing
 this before importing the project will help avoid running into caching issues
@@ -59,6 +57,10 @@ assets from the games.
 
 **If you do not see the `HytaleServer` run configuration, you may need to open
 the dropdown or click `Edit Configurations...` once to unhide it.**
+
+## Importing into VSCode
+While VSCode is not officially supported, you can generate launch configs by 
+running `./gradlew generateVSCodeLaunch`.
 
 ## Connecting to Server
 Once the server is running in IDEA you should be able to connect to 

@@ -96,4 +96,4 @@ demonstration purposes, and should **NOT** be included in your final build.
 
 The example plugin also includes a recipe defined by an asset pack. This recipe
 allows you to craft 10 dirt into 1 dirt using the crafting window. This is also
-an example and should not be removed before you release the plugin.
+an example and should be removed before you release the plugin.

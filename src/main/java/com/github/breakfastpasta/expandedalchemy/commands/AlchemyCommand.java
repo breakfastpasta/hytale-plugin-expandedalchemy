@@ -1,4 +1,4 @@
-package com.github.breakfastpasta.expandedalchemy;
+package com.github.breakfastpasta.expandedalchemy.commands;
 
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;

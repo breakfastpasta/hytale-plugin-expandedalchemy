@@ -14,8 +14,8 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-public class TeleportToSpawnInteraction extends SimpleInstantInteraction {
-    public static final BuilderCodec<TeleportToSpawnInteraction> CODEC;
+public class TeleportHomeInteraction extends SimpleInstantInteraction {
+    public static final BuilderCodec<TeleportHomeInteraction> CODEC;
 
     @Override
     protected void firstRun(@NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NonNullDecl CooldownHandler cooldownHandler) {
@@ -32,7 +32,7 @@ public class TeleportToSpawnInteraction extends SimpleInstantInteraction {
     }
 
     static {
-        CODEC = BuilderCodec.builder(TeleportToSpawnInteraction.class, TeleportToSpawnInteraction::new, SimpleInstantInteraction.CODEC)
+        CODEC = BuilderCodec.builder(TeleportHomeInteraction.class, TeleportHomeInteraction::new, SimpleInstantInteraction.CODEC)
                 .documentation("Teleports a player to their respawn point")
                 .build();
     }

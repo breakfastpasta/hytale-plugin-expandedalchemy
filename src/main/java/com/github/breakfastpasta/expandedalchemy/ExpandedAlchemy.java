@@ -1,7 +1,7 @@
 package com.github.breakfastpasta.expandedalchemy;
 
 import com.github.breakfastpasta.expandedalchemy.commands.AlchemyCommand;
-import com.github.breakfastpasta.expandedalchemy.interactions.TeleportToSpawnInteraction;
+import com.github.breakfastpasta.expandedalchemy.interactions.TeleportHomeInteraction;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -24,6 +24,6 @@ public class ExpandedAlchemy extends JavaPlugin {
                 .registerCommand(new AlchemyCommand(this.getName(), this.getManifest().getVersion().toString()));
 
         this.getCodecRegistry(Interaction.CODEC)
-                .register("TeleportToSpawn", TeleportToSpawnInteraction.class, TeleportToSpawnInteraction.CODEC);
+                .register("EATeleportHome", TeleportHomeInteraction.class, TeleportHomeInteraction.CODEC);
     }
 }

@@ -1,12 +1,17 @@
 package com.github.breakfastpasta.expandedalchemy.interactions;
 
+import com.hypixel.hytale.builtin.teleport.components.TeleportHistory;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Transform;
+import com.hypixel.hytale.math.vector.Vector3d;
+import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.modules.entity.component.HeadRotation;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
@@ -19,15 +24,21 @@ public class TeleportHomeInteraction extends SimpleInstantInteraction {
 
     @Override
     protected void firstRun(@NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NonNullDecl CooldownHandler cooldownHandler) {
-        CommandBuffer<EntityStore> commandBuffer = context.getCommandBuffer();
-        Ref<EntityStore> ref = context.getEntity();
-        Player playerComponent = (Player) commandBuffer.getComponent(ref, Player.getComponentType());
+        final CommandBuffer<EntityStore> buffer = context.getCommandBuffer();
+        if (buffer != null) {
+            final Ref<EntityStore> ref = context.getEntity();
+            final TransformComponent transform = (TransformComponent) buffer.getComponent(ref, TransformComponent.getComponentType());
+            final World world = ((EntityStore) buffer.getExternalData()).getWorld();
 
-        if (playerComponent != null) {
-            World world = ((EntityStore) commandBuffer.getExternalData()).getWorld();
-
-            Transform respawn = Player.getRespawnPosition(ref, world.getName(), commandBuffer);
-            commandBuffer.addComponent(ref, Teleport.getComponentType(), Teleport.createForPlayer(world, respawn));
+            if (transform != null) {
+                final HeadRotation headRotation = (HeadRotation) buffer.getComponent(ref, HeadRotation.getComponentType());
+                if (headRotation != null) {
+                    final Vector3d oldPos = transform.getPosition().clone();
+                    final Vector3f oldRot = headRotation.getRotation().clone();
+                    buffer.ensureAndGetComponent(ref, TeleportHistory.getComponentType()).append(world, oldPos, oldRot, "Home");
+                    buffer.addComponent(ref, Teleport.getComponentType(), Teleport.createForPlayer(null, Player.getRespawnPosition(ref, world.getName(), buffer)));
+                }
+            }
         }
     }
 

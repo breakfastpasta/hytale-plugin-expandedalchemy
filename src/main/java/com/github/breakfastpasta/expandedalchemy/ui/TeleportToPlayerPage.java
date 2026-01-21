@@ -1,5 +1,6 @@
 package com.github.breakfastpasta.expandedalchemy.ui;
 
+import com.hypixel.hytale.builtin.teleport.components.TeleportHistory;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -119,7 +120,7 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
                 assert headRotationComponent != null;
 
                 Vector3d oldPos = transformComponent.getPosition().clone();
-                Vector3f oldRot = transformComponent.getRotation().clone();
+                Vector3f oldRot = headRotationComponent.getRotation().clone();
                 targetWorld.execute(() -> {
                     TransformComponent targetTransformComponent = targetStore.getComponent(targetRef, TransformComponent.getComponentType());
 
@@ -135,6 +136,11 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
                     world.execute(() -> {
                         Teleport teleportComponent = Teleport.createForPlayer(targetWorld, targetTransform);
                         store.addComponent(ref, Teleport.getComponentType(), teleportComponent);
+                        PlayerRef targetPlayerRefComponent = targetStore.getComponent(targetRef, PlayerRef.getComponentType());
+
+                        assert targetPlayerRefComponent != null;
+
+                        store.ensureAndGetComponent(ref, TeleportHistory.getComponentType()).append(world, oldPos, oldRot, "Teleport to " + targetPlayerRefComponent.getUsername());
                     });
                 });
             }

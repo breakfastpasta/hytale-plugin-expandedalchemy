@@ -17,21 +17,22 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+
+import javax.annotation.Nonnull;
 
 public class TeleportHomeInteraction extends SimpleInstantInteraction {
     public static final BuilderCodec<TeleportHomeInteraction> CODEC;
 
     @Override
-    protected void firstRun(@NonNullDecl InteractionType type, @NonNullDecl InteractionContext context, @NonNullDecl CooldownHandler cooldownHandler) {
+    protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {
         final CommandBuffer<EntityStore> buffer = context.getCommandBuffer();
         if (buffer != null) {
             final Ref<EntityStore> ref = context.getEntity();
-            final TransformComponent transform = (TransformComponent) buffer.getComponent(ref, TransformComponent.getComponentType());
-            final World world = ((EntityStore) buffer.getExternalData()).getWorld();
+            final TransformComponent transform = buffer.getComponent(ref, TransformComponent.getComponentType());
+            final World world = buffer.getExternalData().getWorld();
 
             if (transform != null) {
-                final HeadRotation headRotation = (HeadRotation) buffer.getComponent(ref, HeadRotation.getComponentType());
+                final HeadRotation headRotation = buffer.getComponent(ref, HeadRotation.getComponentType());
                 if (headRotation != null) {
                     final Vector3d oldPos = transform.getPosition().clone();
                     final Vector3f oldRot = headRotation.getRotation().clone();

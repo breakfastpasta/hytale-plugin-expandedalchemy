@@ -5,3 +5,4 @@ A Hytale plugin that adds new potions! You will recognize many of them from Terr
 ### potions included
 
 - Recall Potion
+- Wormhole Potion

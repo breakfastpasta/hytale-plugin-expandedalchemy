@@ -1,2 +1,7 @@
 items.Potion_Recall.name = Recall Potion
 items.Potion_Recall.description = Teleports back to your respawn location.
+items.Potion_Wormhole.name = Wormhole Potion
+items.Potion_Wormhole.description = Teleports to a chosen player.
+
+customUI.teleportToPlayerListPage.noPlayers = No other players online!
+customUI.TeleportToPlayerPage.title = Teleport to...

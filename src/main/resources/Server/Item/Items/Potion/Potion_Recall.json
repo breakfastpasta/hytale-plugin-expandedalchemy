@@ -76,8 +76,12 @@
         "Quantity": 1
       },
       {
-        "ItemId": "Ingredient_Life_Essence",
+        "ItemId": "Ingredient_Void_Essence",
         "Quantity": 10
+      },
+      {
+        "ItemId": "Plant_Flower_Common_Yellow2",
+        "Quantity": 5
       }
     ],
     "BenchRequirement": [

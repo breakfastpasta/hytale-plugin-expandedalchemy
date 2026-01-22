@@ -59,7 +59,7 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
 
                 for (PlayerRef playerRef : playerRefs) {
                     Ref<EntityStore> curRef = playerRef.getReference();
-                    if (curRef != null && curRef.isValid()) {
+                    if (curRef != null && curRef.isValid() && curRef != ref) {
                         Player playerComponent = store.getComponent(curRef, Player.getComponentType());
                         if (playerComponent != null) {
                             DisplayNameComponent displayNameComponent = store.getComponent(curRef, DisplayNameComponent.getComponentType());

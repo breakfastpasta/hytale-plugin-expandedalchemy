@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
@@ -30,13 +31,15 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlayerPage.TeleportToPlayerPageEventData> {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     @Nonnull
     private static final String PAGE_UI_FILE = "Pages/PlayerListEntryButton.ui";
-    private final Map<String, Ref<EntityStore>> players = new HashMap<>();
+    private final ConcurrentHashMap<String, Ref<EntityStore>> players = new ConcurrentHashMap<>();
     @Nonnull
     private String searchQuery = "";
 
@@ -44,33 +47,39 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
         super(playerRef, CustomPageLifetime.CanDismiss, TeleportToPlayerPageEventData.CODEC);
     }
 
-    private void buildPlayerMap(@Nonnull Ref<EntityStore> ref) {
+    private CompletableFuture<Void> buildPlayerMapAsync(@Nonnull Ref<EntityStore> ref) {
         Map<String, World> worlds = Universe.get().getWorlds();
+        ObjectArrayList<CompletableFuture<Void>> futures = new ObjectArrayList<>();
 
         for (Map.Entry<String, World> entry : worlds.entrySet()) {
             World world = entry.getValue();
-            Store<EntityStore> store = world.getEntityStore().getStore();
-            Collection<PlayerRef> playerRefs = world.getPlayerRefs();
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                Store<EntityStore> store = world.getEntityStore().getStore();
+                Collection<PlayerRef> playerRefs = world.getPlayerRefs();
 
-            for (PlayerRef playerRef : playerRefs) {
-                Ref<EntityStore> curRef = playerRef.getReference();
-                if (curRef != null && curRef.isValid() && curRef != ref) {
-                    Player playerComponent = store.getComponent(curRef, Player.getComponentType());
-                    if (playerComponent != null) {
-                        DisplayNameComponent displayNameComponent = store.getComponent(curRef, DisplayNameComponent.getComponentType());
+                for (PlayerRef playerRef : playerRefs) {
+                    Ref<EntityStore> curRef = playerRef.getReference();
+                    if (curRef != null && curRef.isValid()) {
+                        Player playerComponent = store.getComponent(curRef, Player.getComponentType());
+                        if (playerComponent != null) {
+                            DisplayNameComponent displayNameComponent = store.getComponent(curRef, DisplayNameComponent.getComponentType());
 
-                        assert displayNameComponent != null;
+                            assert displayNameComponent != null;
 
-                        Message displayName = displayNameComponent.getDisplayName();
-                        if (displayName != null) {
-                            this.players.put(displayName.toString(), curRef);
-                        } else {
-                            this.players.put(playerRef.getUsername(), curRef);
+                            Message displayName = displayNameComponent.getDisplayName();
+                            if (displayName != null) {
+                                this.players.put(displayName.getAnsiMessage(), curRef);
+                            } else {
+                                this.players.put(playerRef.getUsername(), curRef);
+                            }
                         }
                     }
                 }
-            }
+            }, world);
+            futures.add(future);
         }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     private void updatePlayerList(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder) {
@@ -99,15 +108,15 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Store<EntityStore> store) {
         commandBuilder.append("Pages/TeleportToPlayerPage.ui");
         eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput", EventData.of("@SearchQuery", "#SearchInput.Value"));
-        this.buildPlayerMap(ref);
-        this.updatePlayerList(commandBuilder, eventBuilder);
+        this.buildPlayerMapAsync(ref)
+                .thenRun(() -> this.updatePlayerList(commandBuilder, eventBuilder));
     }
 
     public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull TeleportToPlayerPageEventData eventData) {
         if (eventData.getPlayer() != null) {
             World world = store.getExternalData().getWorld();
             Ref<EntityStore> targetRef = this.players.get(eventData.getPlayer());
-            /* check validity again (maybe they disconnected?) */
+            // check validity again (maybe they disconnected?)
             if (targetRef.isValid()) {
                 Store<EntityStore> targetStore = targetRef.getStore();
                 World targetWorld = targetStore.getExternalData().getWorld();

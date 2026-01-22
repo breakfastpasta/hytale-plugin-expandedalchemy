@@ -118,6 +118,8 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
             Ref<EntityStore> targetRef = this.players.get(eventData.getPlayer());
             // check validity again (maybe they disconnected?)
             if (targetRef.isValid()) {
+                close();
+
                 Store<EntityStore> targetStore = targetRef.getStore();
                 World targetWorld = targetStore.getExternalData().getWorld();
                 TransformComponent transformComponent = store.getComponent(ref, TransformComponent.getComponentType());

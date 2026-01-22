@@ -84,11 +84,11 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
 
     private void updatePlayerList(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder) {
         commandBuilder.clear("#PlayerList");
-        ObjectArrayList<String> playerNames = new ObjectArrayList<>(this.players.keySet());
+        ObjectArrayList<String> playerNames = new ObjectArrayList<>(players.keySet());
         if (playerNames.isEmpty()) {
             commandBuilder.appendInline("#PlayerList", "Label { Text: %server.customUI.teleportToPlayerListPage.noPlayers; Style: (Alignment: Center); }");
         } else {
-            if (!this.searchQuery.isEmpty()) {
+            if (!searchQuery.isEmpty()) {
                 playerNames.removeIf((p) -> !p.toLowerCase().contains(this.searchQuery));
             }
 
@@ -108,14 +108,14 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Store<EntityStore> store) {
         commandBuilder.append("Pages/TeleportToPlayerPage.ui");
         eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput", EventData.of("@SearchQuery", "#SearchInput.Value"));
-        this.buildPlayerMapAsync(ref)
+        buildPlayerMapAsync(ref)
                 .thenRun(() -> this.updatePlayerList(commandBuilder, eventBuilder));
     }
 
     public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull TeleportToPlayerPageEventData eventData) {
         if (eventData.getPlayer() != null) {
             World world = store.getExternalData().getWorld();
-            Ref<EntityStore> targetRef = this.players.get(eventData.getPlayer());
+            Ref<EntityStore> targetRef = players.get(eventData.getPlayer());
             // check validity again (maybe they disconnected?)
             if (targetRef.isValid()) {
                 close();
@@ -156,12 +156,12 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
                 });
             }
         } else if (eventData.getSearchQuery() != null) {
-            this.searchQuery = eventData.getSearchQuery().trim().toLowerCase();
+            searchQuery = eventData.getSearchQuery().trim().toLowerCase();
 
             UICommandBuilder commandBuilder = new UICommandBuilder();
             UIEventBuilder eventBuilder = new UIEventBuilder();
-            this.updatePlayerList(commandBuilder, eventBuilder);
-            this.sendUpdate(commandBuilder, eventBuilder, false);
+            updatePlayerList(commandBuilder, eventBuilder);
+            sendUpdate(commandBuilder, eventBuilder, false);
         }
     }
 
@@ -173,9 +173,9 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
         private String player;
         private String searchQuery;
 
-        public String getPlayer() { return this.player; }
+        public String getPlayer() { return player; }
 
-        public String getSearchQuery() { return this.searchQuery; }
+        public String getSearchQuery() { return searchQuery; }
 
         static {
             CODEC = BuilderCodec.builder(TeleportToPlayerPageEventData.class, TeleportToPlayerPageEventData::new)

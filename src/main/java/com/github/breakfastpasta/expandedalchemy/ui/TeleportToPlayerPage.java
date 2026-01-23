@@ -109,7 +109,12 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
         commandBuilder.append("Pages/TeleportToPlayerPage.ui");
         eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput", EventData.of("@SearchQuery", "#SearchInput.Value"));
         buildPlayerMapAsync(ref)
-                .thenRun(() -> this.updatePlayerList(commandBuilder, eventBuilder));
+                .thenRun(() -> {
+                    UICommandBuilder updateCommandBuilder = new UICommandBuilder();
+                    UIEventBuilder updateEventBuilder = new UIEventBuilder();
+                    updatePlayerList(updateCommandBuilder, updateEventBuilder);
+                    sendUpdate(updateCommandBuilder, updateEventBuilder, false);
+                });
     }
 
     public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull TeleportToPlayerPageEventData eventData) {

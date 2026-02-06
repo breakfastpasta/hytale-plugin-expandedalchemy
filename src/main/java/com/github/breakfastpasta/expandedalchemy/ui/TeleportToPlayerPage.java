@@ -47,7 +47,7 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
         super(playerRef, CustomPageLifetime.CanDismiss, TeleportToPlayerPageEventData.CODEC);
     }
 
-    private CompletableFuture<Void> buildPlayerMapAsync(@Nonnull Ref<EntityStore> ref) {
+    private CompletableFuture<Void> buildPlayerMap(@Nonnull Ref<EntityStore> ref) {
         Map<String, World> worlds = Universe.get().getWorlds();
         ObjectArrayList<CompletableFuture<Void>> futures = new ObjectArrayList<>();
 
@@ -108,7 +108,7 @@ public class TeleportToPlayerPage extends InteractiveCustomUIPage<TeleportToPlay
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Store<EntityStore> store) {
         commandBuilder.append("Pages/TeleportToPlayerPage.ui");
         eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput", EventData.of("@SearchQuery", "#SearchInput.Value"));
-        buildPlayerMapAsync(ref)
+        buildPlayerMap(ref)
                 .thenRun(() -> {
                     UICommandBuilder updateCommandBuilder = new UICommandBuilder();
                     UIEventBuilder updateEventBuilder = new UIEventBuilder();

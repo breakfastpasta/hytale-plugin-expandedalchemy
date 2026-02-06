@@ -36,8 +36,11 @@ public class TeleportHomeInteraction extends SimpleInstantInteraction {
                 if (headRotation != null) {
                     final Vector3d oldPos = transform.getPosition().clone();
                     final Vector3f oldRot = headRotation.getRotation().clone();
+
+                    Player.getRespawnPosition(ref, world.getName(), buffer).thenAcceptAsync((homeTransform) -> {
+                        buffer.addComponent(ref, Teleport.getComponentType(), Teleport.createForPlayer(null, homeTransform));
+                    }, world);
                     buffer.ensureAndGetComponent(ref, TeleportHistory.getComponentType()).append(world, oldPos, oldRot, "Home");
-                    buffer.addComponent(ref, Teleport.getComponentType(), Teleport.createForPlayer(null, Player.getRespawnPosition(ref, world.getName(), buffer)));
                 }
             }
         }
